@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apple Style Header with Search</title>
+    <title>4kwallpaper - Home</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header class="apple-header">
         <div class="header-content">
-            <div class="logo-container">
+            <a href="index.html" class="logo-container">
                 <img src="4kwallpaperlogo.png" alt="Site Logo" class="logo">
-            </div>
+                <span class="logo-text">4kwallpaper</span>
+            </a>
 
             <div class="search-bar-container">
                 <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -23,6 +24,7 @@
             </div>
 
             <div class="header-actions">
+                <a href="post.html" class="write-btn">Write</a>
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
                     <div class="toggle-slider"></div>
                     <svg class="icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -44,20 +46,22 @@
         </div>
     </header>
 
-    <main class="main-content">
-        <div class="post-card">
-            <h3>4K Nature Wallpaper</h3>
-            <p>Beautiful ultra-HD landscapes featuring mountains, oceans, and forests.</p>
-        </div>
-        <div class="post-card">
-            <h3>Minimalist Abstract Art</h3>
-            <p>Clean vectors and shapes tailored perfectly for premium dark mode setups.</p>
-        </div>
-        <div class="post-card">
-            <h3>Cyberpunk Cityscape</h3>
-            <p>Neon-lit futuristic streets captured in flawless high resolution.</p>
+    <main class="medium-container">
+        <div id="postsFeed">
+            <p class="loading-status">Loading stories...</p>
         </div>
     </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2026 4kwallpaper.</p>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Terms & Conditions</a>
+                <a href="#">Disclaimer</a>
+            </div>
+        </div>
+    </footer>
 
     <script src="script.js"></script>
 </body>
