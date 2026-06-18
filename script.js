@@ -1,4 +1,3 @@
-// Automatically configured for your repository
 const GITHUB_USERNAME = "ganesh412004";
 const REPO_NAME = "4kwallpaper";
 const API_URL = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/posts`;
@@ -9,18 +8,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const postsFeed = document.getElementById("postsFeed");
     const htmlEl = document.documentElement;
 
-    // 1. Theme Toggle Logic
+    // 1. Apple Mode Management Logic
     themeToggle.addEventListener("click", () => {
         htmlEl.classList.toggle("dark-mode");
         localStorage.setItem("theme", htmlEl.classList.contains("dark-mode") ? "dark" : "light");
     });
 
-    // 2. Fetch posts automatically from your GitHub repository folder
+    // Simple deterministic string-hashing helper to create believable simulated views
+    function generateViewsCount(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return Math.abs((hash % 850) + 150) + "K views";
+    }
+
+    // 2. Fetch data array and process the Medium discovery order logic
     async function loadStoriesFromGitHub() {
         try {
             const res = await fetch(API_URL);
             if (!res.ok) {
-                postsFeed.innerHTML = '<p class="loading-status">Welcome! Create a folder named "posts" in your GitHub repository and add your first post to begin.</p>';
+                postsFeed.innerHTML = '<p class="loading-status">Welcome Admin! Create a folder named "posts" in your GitHub repository to begin sync protocols.</p>';
                 return;
             }
             
@@ -28,28 +36,44 @@ document.addEventListener("DOMContentLoaded", () => {
             const jsonFiles = files.filter(file => file.name.endsWith('.json'));
             
             if (jsonFiles.length === 0) {
-                postsFeed.innerHTML = '<p class="loading-status">Your feed is empty. Use post.html to create a post!</p>';
+                postsFeed.innerHTML = '<p class="loading-status">No active stories found inside the repository directory layout.</p>';
                 return;
             }
 
-            postsFeed.innerHTML = ""; // Clear loading message
-
-            // Fetch file contents concurrently
+            // Pull and parse details concurrently
             const fetchPromises = jsonFiles.map(file => fetch(file.download_url).then(r => r.json()));
-            const articles = await Promise.all(fetchPromises);
+            let articles = await Promise.all(fetchPromises);
 
-            // Sort posts by date (newest first)
-            articles.sort((a, b) => new Date(b.date) - new Date(a.date));
+            // --- MEDIUM ALGORITHM IMPLEMENTATION ---
+            // Shuffles all entries randomly on every single refresh to boost content visibility
+            articles.sort(() => Math.random() - 0.5);
+
+            postsFeed.innerHTML = ""; // Drop parsing screens
 
             articles.forEach(post => {
-                const dateFormatted = new Date(post.date).toLocaleDateString('en-US', {
-                    month: 'short', day: 'numeric', year: 'numeric'
+                const dateFormatted = new Date(post.date || Date.now()).toLocaleDateString('en-US', {
+                    month: 'short', day: 'numeric'
                 });
+
+                // Calculate genuine read times based on text length (avg 200 words per min)
+                const wordCount = ((post.content || "") + (post.subtitle || "")).split(/\s+/).length;
+                const readingTime = Math.max(1, Math.ceil(wordCount / 200)) + " min read";
+                
+                // Get a stable visual analytics view metric
+                const viewsMetric = generateViewsCount(post.title);
 
                 const card = document.createElement("article");
                 card.className = "medium-card";
                 card.innerHTML = `
-                    <div class="meta-row">Published on ${dateFormatted}</div>
+                    <div class="meta-row">
+                        <span class="algorithm-badge">Trending</span>
+                        <span>&middot;</span>
+                        <span>${dateFormatted}</span>
+                        <span>&middot;</span>
+                        <span>${readingTime}</span>
+                        <span>&middot;</span>
+                        <span>${viewsMetric}</span>
+                    </div>
                     <h2>${post.title}</h2>
                     <p>${post.subtitle}</p>
                 `;
@@ -57,12 +81,12 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
         } catch (err) {
-            postsFeed.innerHTML = '<p class="loading-status">Error connecting to your GitHub story feed.</p>';
+            postsFeed.innerHTML = '<p class="loading-status">Error parsing algorithmic content distribution matrix.</p>';
             console.error(err);
         }
     }
 
-    // 3. Search Bar Filter Logic
+    // 3. Filtering Logic Engine
     if (searchInput) {
         searchInput.addEventListener("input", (e) => {
             const query = e.target.value.toLowerCase().trim();
