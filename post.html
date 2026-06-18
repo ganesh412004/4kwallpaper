@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publish a Story - 4kwallpaper</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="apple-header">
+        <div class="header-content">
+            <a href="index.html" class="logo-container">
+                <img src="4kwallpaperlogo.png" alt="Site Logo" class="logo">
+                <span class="logo-text">4kwallpaper</span>
+            </a>
+            
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+                    <div class="toggle-slider"></div>
+                    <svg class="icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="icon moon-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="editor-container">
+        <form id="editorForm">
+            <input type="text" id="postTitle" class="editor-title" placeholder="Title" required autocomplete="off">
+            <input type="text" id="postSubtitle" class="editor-subtitle" placeholder="Short description or subtitle..." required autocomplete="off">
+            <textarea id="postContent" class="editor-body" placeholder="Tell your story..." required></textarea>
+            
+            <div class="editor-actions">
+                <button type="submit" class="publish-btn">Publish Story</button>
+            </div>
+        </form>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2026 4kwallpaper.</p>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Terms & Conditions</a>
+                <a href="#">Disclaimer</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="post.js"></script>
+</body>
+</html>
