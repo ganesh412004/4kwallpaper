@@ -6,7 +6,7 @@
     <title>4kwallpaper - Feed</title>
     <link rel="stylesheet" href="style.css">
     <script>
-        // Inline layout lock to block white flashes when loading into Dark Mode
+        // Instant theme configuration lock
         if (localStorage.getItem("theme") === "dark") {
             document.documentElement.classList.add("dark-mode");
         }
@@ -49,12 +49,20 @@
         <div class="footer-content">
             <p>&copy; 2026 4kwallpaper.</p>
             <div class="footer-links">
-                <a href="#">About</a>
-                <a href="#">Terms & Conditions</a>
-                <a href="#">Disclaimer</a>
+                <a href="#" id="openAbout">About</a>
+                <a href="#" id="openTerms">Terms & Conditions</a>
+                <a href="#" id="openDisclaimer">Disclaimer</a>
             </div>
         </div>
     </footer>
+
+    <div id="footerModal" class="modal-overlay">
+        <div class="modal-box">
+            <button class="modal-close" id="closeModal">&times;</button>
+            <h2 id="modalTitle">Title</h2>
+            <div id="modalBody" class="modal-text">Content goes here...</div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
