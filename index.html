@@ -3,32 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apple Style Header</title>
+    <title>Apple Style Header with Search</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header class="apple-header">
         <div class="header-content">
-            <!-- Logo -->
             <div class="logo-container">
                 <img src="4kwallpaperlogo.png" alt="Site Logo" class="logo">
             </div>
 
-            <!-- Right Side Actions -->
-            <div class="header-actions">
-                <!-- Search Button -->
-                <button class="action-btn search-btn" aria-label="Search">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                </button>
+            <div class="search-bar-container">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="headerSearch" placeholder="Search" autocomplete="off">
+            </div>
 
-                <!-- Theme Toggle Switch -->
+            <div class="header-actions">
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
                     <div class="toggle-slider"></div>
-                    <!-- Sun Icon (Light Mode) -->
                     <svg class="icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="5"></circle>
                         <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -40,7 +36,6 @@
                         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
-                    <!-- Moon Icon (Dark Mode) -->
                     <svg class="icon moon-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
@@ -49,11 +44,19 @@
         </div>
     </header>
 
-    <!-- Placeholder for page content -->
-    <main class="content-placeholder">
-        <div class="skeleton-line large"></div>
-        <div class="skeleton-line medium"></div>
-        <div class="skeleton-line small"></div>
+    <main class="main-content">
+        <div class="post-card">
+            <h3>4K Nature Wallpaper</h3>
+            <p>Beautiful ultra-HD landscapes featuring mountains, oceans, and forests.</p>
+        </div>
+        <div class="post-card">
+            <h3>Minimalist Abstract Art</h3>
+            <p>Clean vectors and shapes tailored perfectly for premium dark mode setups.</p>
+        </div>
+        <div class="post-card">
+            <h3>Cyberpunk Cityscape</h3>
+            <p>Neon-lit futuristic streets captured in flawless high resolution.</p>
+        </div>
     </main>
 
     <script src="script.js"></script>
