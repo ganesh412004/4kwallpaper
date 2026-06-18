@@ -1,25 +1,46 @@
 document.addEventListener("DOMContentLoaded", () => {
     const themeToggle = document.getElementById("themeToggle");
+    const searchInput = document.getElementById("headerSearch");
     const body = document.body;
 
-    // Check if the user already set a preference in a previous session
+    // --- 1. THEME TOGGLE LOGIC ---
     const savedTheme = localStorage.getItem("theme");
-    
-    // Apply the saved theme if it exists
     if (savedTheme === "dark") {
         body.classList.add("dark-mode");
     }
 
-    // Listen for clicks on the toggle button
     themeToggle.addEventListener("click", () => {
-        // Toggle the 'dark-mode' class on the body
         body.classList.toggle("dark-mode");
-        
-        // Save the new preference to local storage
         if (body.classList.contains("dark-mode")) {
             localStorage.setItem("theme", "dark");
         } else {
             localStorage.setItem("theme", "light");
+        }
+    });
+
+    // --- 2. FULLY WORKING SEARCH BAR LOGIC ---
+    searchInput.addEventListener("input", (e) => {
+        const searchQuery = e.target.value.toLowerCase().trim();
+        const posts = document.querySelectorAll(".post-card");
+
+        posts.forEach(post => {
+            const title = post.querySelector("h3").textContent.toLowerCase();
+            const description = post.querySelector("p").textContent.toLowerCase();
+
+            // If the query matches either the title or text body, display it. Otherwise, hide it.
+            if (title.includes(searchQuery) || description.includes(searchQuery)) {
+                post.style.display = "block";
+            } else {
+                post.style.display = "none";
+            }
+        });
+    });
+
+    // Listen for the "Enter" key inside search
+    searchInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            console.log("Search executed for: ", searchInput.value);
+            // Optional: Add logic to fetch distinct results from Cloudflare backend here later
         }
     });
 });
