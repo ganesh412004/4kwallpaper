@@ -1,44 +1,45 @@
-const API_URL = "https://your-worker-name.your-subdomain.workers.dev/posts";
+// Automatically configured for your repository
+const GITHUB_USERNAME = "ganesh412004";
+const REPO_NAME = "4kwallpaper";
 
 document.addEventListener("DOMContentLoaded", () => {
     const themeToggle = document.getElementById("themeToggle");
     const editorForm = document.getElementById("editorForm");
-    const body = document.body;
+    const htmlEl = document.documentElement;
 
-    // Theme Management Sync
-    if (localStorage.getItem("theme") === "dark") body.classList.add("dark-mode");
     themeToggle.addEventListener("click", () => {
-        body.classList.toggle("dark-mode");
-        localStorage.setItem("theme", body.classList.contains("dark-mode") ? "dark" : "light");
+        htmlEl.classList.toggle("dark-mode");
+        localStorage.setItem("theme", htmlEl.classList.contains("dark-mode") ? "dark" : "light");
     });
 
-    // Submit article post request to database
-    editorForm.addEventListener("submit", async (e) => {
+    editorForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        
+
         const title = document.getElementById("postTitle").value;
         const subtitle = document.getElementById("postSubtitle").value;
-        const mainContent = document.getElementById("postContent").value;
+        const content = document.getElementById("postContent").value;
+        const todayStr = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
 
-        // Combine fields for the simple database format
-        const finalContent = `${subtitle}\n\n${mainContent}`;
+        // Formats data layout structure
+        const jsonOutput = {
+            title: title,
+            subtitle: subtitle,
+            content: content,
+            date: todayStr
+        };
 
-        try {
-            const response = await fetch(API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title: title, content: finalContent })
-            });
+        // Makes a clean, URL-friendly file name from the title
+        const cleanFileName = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'story';
 
-            if (response.ok) {
-                // Return users directly to homepage to view updated layout feeds
-                window.location.href = "index.html";
-            } else {
-                alert("Database insertion rejected. Verify configurations.");
-            }
-        } catch (err) {
-            console.error(err);
-            alert("Error sending transaction request.");
-        }
+        // Copies the JSON automatically into your clipboard memory
+        navigator.clipboard.writeText(JSON.stringify(jsonOutput, null, 2)).then(() => {
+            alert(`Success! Post code copied to your clipboard.\n\nFile Name: ${cleanFileName}.json\n\nYou will now be sent directly to GitHub. Just click paste (Ctrl+V / Cmd+V) and commit the file!`);
+            
+            // Seamlessly opens the exact folder destination layout in your repository
+            window.location.href = `https://github.com/${GITHUB_USERNAME}/${REPO_NAME}/new/main/posts?filename=${cleanFileName}.json`;
+        }).catch(err => {
+            console.error("Clipboard failed: ", err);
+            alert("Could not copy code automatically. Please manually copy the data output.");
+        });
     });
 });
