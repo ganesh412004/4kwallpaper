@@ -3,105 +3,342 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4kwallpaper - Stories Feed</title>
-    <link rel="stylesheet" href="style.css">
-    <script>
-        if (localStorage.getItem("theme") === "dark") {
-            document.documentElement.classList.add("dark-mode");
+    <title>4kwallpaper - Stories</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #191919;
+            --text-light: #757575;
+            --border: #e5e5e5;
+            --hover: #f2f2f2;
         }
-    </script>
+        html.dark-mode {
+            --bg: #0a0a0a;
+            --text: #f2f2f2;
+            --text-light: #9c9c9c;
+            --border: #2a2a2a;
+            --hover: #1f1f1f;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+        }
+        .navbar {
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+        }
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .theme-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text);
+        }
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .feed {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 40px;
+        }
+        .post {
+            display: grid;
+            grid-template-columns: 1fr 150px;
+            gap: 16px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .post:hover {
+            background: var(--hover);
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .post-text h2 {
+            font-size: 20px;
+            margin: 0 0 8px 0;
+            color: var(--text);
+        }
+        .post-text p {
+            font-size: 15px;
+            color: var(--text-light);
+            margin: 0 0 12px 0;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .post-meta {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        .post-image {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            background-size: cover;
+            background-position: center;
+        }
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .sidebar-box {
+            background: var(--hover);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .sidebar-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .search-input {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 10px 16px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+        }
+        .search-input:focus {
+            border-color: var(--text);
+        }
+        .staff-pick {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            gap: 12px;
+        }
+        .staff-pick:last-child {
+            border-bottom: none;
+        }
+        .staff-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #667eea;
+            flex-shrink: 0;
+        }
+        .staff-text {
+            flex: 1;
+            min-width: 0;
+        }
+        .staff-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .staff-title {
+            font-size: 12px;
+            color: var(--text-light);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .loading {
+            text-align: center;
+            color: var(--text-light);
+            padding: 40px 20px;
+        }
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .feed { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .post { grid-template-columns: 1fr 100px; }
+            .post-image { width: 100px; height: 100px; }
+        }
+    </style>
 </head>
 <body>
 
-    <header class="navbar">
-        <div class="navbar-content">
-            <a href="index.html" class="logo-container">
-                <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                    <polyline points="13 2 13 9 20 9"></polyline>
-                </svg>
-                <span class="logo-text">4kwallpaper</span>
-            </a>
+<header class="navbar">
+    <div class="navbar-content">
+        <a href="/" class="logo">📖 4kwallpaper</a>
+        <button class="theme-btn" id="themeBtn">🌙</button>
+    </div>
+</header>
 
-            <div class="nav-middle">
-                <a href="#" class="nav-item">For you</a>
-                <a href="#featured" class="nav-item active">Featured</a>
+<main class="main">
+    <div class="feed">
+        <section id="feed"></section>
+        <aside class="sidebar">
+            <div class="sidebar-box">
+                <input type="text" id="search" placeholder="Search posts..." class="search-input">
             </div>
-
-            <div class="nav-actions">
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
-                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="5"></circle>
-                        <line x1="12" y1="1" x2="12" y2="3"></line>
-                        <line x1="12" y1="21" x2="12" y2="23"></line>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                        <line x1="1" y1="12" x2="3" y2="12"></line>
-                        <line x1="21" y1="12" x2="23" y2="12"></line>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                    </svg>
-                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                    </svg>
-                </button>
+            <div class="sidebar-box">
+                <div class="sidebar-title">Staff Picks</div>
+                <div id="staffPicks"></div>
             </div>
-        </div>
-        <div class="navbar-divider"></div>
-    </header>
+        </aside>
+    </div>
+</main>
 
-    <main class="main-container">
-        <div class="feed-wrapper">
-            <!-- LEFT SECTION: Posts Feed -->
-            <section class="feed-section">
-                <div id="postsFeed" class="posts-container">
-                    <div class="loading-state">
-                        <p>Loading stories...</p>
-                    </div>
+<script>
+const API_URL = 'https://api.github.com/repos/ganesh412004/4kwallpaper/contents/posts';
+const IMAGES = [
+    'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=300&fit=crop',
+    'https://images.unsplash.com/photo-1633356122544-f134324ef6db?w=600&h=300&fit=crop',
+    'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=600&h=300&fit=crop',
+    'https://images.unsplash.com/photo-1516321318423-f06b1b504d4a?w=600&h=300&fit=crop'
+];
+
+const feed = document.getElementById('feed');
+const staffPicks = document.getElementById('staffPicks');
+const search = document.getElementById('search');
+const themeBtn = document.getElementById('themeBtn');
+const html = document.documentElement;
+
+let allPosts = [];
+
+// Theme toggle
+themeBtn.addEventListener('click', () => {
+    html.classList.toggle('dark-mode');
+    localStorage.setItem('theme', html.classList.contains('dark-mode') ? 'dark' : 'light');
+    themeBtn.textContent = html.classList.contains('dark-mode') ? '☀️' : '🌙';
+});
+
+if (localStorage.getItem('theme') === 'dark') {
+    html.classList.add('dark-mode');
+    themeBtn.textContent = '☀️';
+}
+
+// Load posts
+async function loadPosts() {
+    try {
+        console.log('Fetching posts from:', API_URL);
+        const res = await fetch(API_URL);
+        const files = await res.json();
+        
+        if (!Array.isArray(files)) {
+            feed.innerHTML = '<div class="error">❌ No posts folder found. Create /posts folder with .json files.</div>';
+            return;
+        }
+        
+        const jsonFiles = files.filter(f => f.name.endsWith('.json'));
+        console.log('Found JSON files:', jsonFiles.map(f => f.name));
+        
+        if (jsonFiles.length === 0) {
+            feed.innerHTML = '<div class="loading">📝 No posts yet. Add .json files to /posts folder.</div>';
+            return;
+        }
+        
+        allPosts = [];
+        
+        for (let i = 0; i < jsonFiles.length; i++) {
+            const file = jsonFiles[i];
+            try {
+                const content = await fetch(file.download_url).then(r => r.json());
+                content.__filename = file.name;
+                content.__index = i;
+                allPosts.push(content);
+                console.log('Loaded post:', content.title);
+            } catch (e) {
+                console.error('Error loading', file.name, ':', e);
+            }
+        }
+        
+        if (allPosts.length === 0) {
+            feed.innerHTML = '<div class="error">❌ Failed to parse post files. Check JSON format.</div>';
+            return;
+        }
+        
+        displayPosts(allPosts);
+        displayStaffPicks(allPosts.slice(0, 3));
+        
+    } catch (e) {
+        console.error('Error:', e);
+        feed.innerHTML = '<div class="error">❌ Network error. Check console.</div>';
+    }
+}
+
+function displayPosts(posts) {
+    feed.innerHTML = posts.map((post, i) => `
+        <a href="post.html?file=${encodeURIComponent(post.__filename)}" style="text-decoration: none; color: inherit;">
+            <div class="post">
+                <div class="post-text">
+                    <h2>${escapeHtml(post.title)}</h2>
+                    <p>${escapeHtml(post.subtitle)}</p>
+                    <div class="post-meta">${post.date || 'Today'} • ${Math.ceil((post.content || '').split(' ').length / 200)} min read</div>
                 </div>
-            </section>
-
-            <!-- RIGHT SECTION: Sidebar -->
-            <aside class="sidebar">
-                <!-- Search -->
-                <div class="sidebar-box search-box">
-                    <input type="text" id="sidebarSearch" placeholder="Search" class="search-input" autocomplete="off">
-                </div>
-
-                <!-- Staff Picks -->
-                <div class="sidebar-box">
-                    <h3 class="sidebar-title">Staff Picks</h3>
-                    <div id="staffPicks" class="staff-picks-list">
-                        <div class="loading-text">Loading...</div>
-                    </div>
-                </div>
-
-                <!-- Recommended Topics -->
-                <div class="sidebar-box">
-                    <h3 class="sidebar-title">Recommended topics</h3>
-                    <div class="topics-list">
-                        <button class="topic-btn">+ Programming</button>
-                        <button class="topic-btn">+ Technology</button>
-                        <button class="topic-btn">+ Design</button>
-                        <button class="topic-btn">+ Writing</button>
-                    </div>
-                </div>
-            </aside>
-        </div>
-    </main>
-
-    <footer class="footer">
-        <div class="footer-content">
-            <p>&copy; 2026 4kwallpaper</p>
-            <div class="footer-links">
-                <a href="#">About</a>
-                <a href="#">Help</a>
-                <a href="#">Terms</a>
-                <a href="#">Privacy</a>
+                <div class="post-image" style="background-image: url('${IMAGES[i % IMAGES.length]}');"></div>
             </div>
-        </div>
-    </footer>
+        </a>
+    `).join('');
+}
 
-    <script src="script.js"></script>
+function displayStaffPicks(posts) {
+    staffPicks.innerHTML = posts.map((post, i) => `
+        <a href="post.html?file=${encodeURIComponent(post.__filename)}" class="staff-pick">
+            <div class="staff-avatar" style="background-image: url('${IMAGES[i]}'); background-size: cover;"></div>
+            <div class="staff-text">
+                <div class="staff-label">Staff Pick</div>
+                <div class="staff-title">${escapeHtml(post.title)}</div>
+            </div>
+        </a>
+    `).join('');
+}
+
+search.addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase();
+    const filtered = allPosts.filter(p => 
+        (p.title || '').toLowerCase().includes(q) || 
+        (p.subtitle || '').toLowerCase().includes(q)
+    );
+    displayPosts(filtered);
+});
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+loadPosts();
+</script>
+
 </body>
 </html>

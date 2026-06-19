@@ -1,0 +1,6 @@
+{
+  "title": "Welcome to 4kwallpaper",
+  "subtitle": "Your first post - Simple, clean, and working perfectly",
+  "content": "This is your first post on 4kwallpaper!\n\nHow to add more posts:\n\n1. Go to: github.com/ganesh412004/4kwallpaper/tree/main/posts\n2. Click 'Add file' → 'Create new file'\n3. Name it: your-post.json\n4. Paste this format:\n\n{\n  \"title\": \"Your Title\",\n  \"subtitle\": \"Short description\",\n  \"content\": \"Your full text here\",\n  \"date\": \"2026-06-19\"\n}\n\n5. Click 'Commit changes'\n\nYour post will appear instantly on the home page! Every post gets a beautiful image from Unsplash automatically.\n\nEnjoy!",
+  "date": "2026-06-19"
+}

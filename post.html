@@ -3,55 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Draft Story - 4kwallpaper</title>
-    <link rel="stylesheet" href="style.css">
-    <script>
-        if (localStorage.getItem("theme") === "dark") {
-            document.documentElement.classList.add("dark-mode");
+    <title>4kwallpaper - Post</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #191919;
+            --text-light: #757575;
+            --border: #e5e5e5;
         }
-    </script>
+        html.dark-mode {
+            --bg: #0a0a0a;
+            --text: #f2f2f2;
+            --text-light: #9c9c9c;
+            --border: #2a2a2a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+        }
+        .navbar {
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+        }
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .theme-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text);
+        }
+        .main {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .back-link {
+            text-decoration: none;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+        .back-link:hover {
+            color: var(--text);
+        }
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+            line-height: 1.2;
+        }
+        .subtitle {
+            font-size: 20px;
+            color: var(--text-light);
+            margin: 0 0 20px 0;
+            line-height: 1.4;
+        }
+        .meta {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .content {
+            font-size: 18px;
+            line-height: 1.7;
+        }
+        .content p {
+            margin-bottom: 24px;
+        }
+        .loading {
+            text-align: center;
+            color: var(--text-light);
+            padding: 40px 20px;
+        }
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 16px;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 <body>
 
-    <header class="apple-header">
-        <div class="header-content">
-            <a href="index.html" class="logo-container">
-                <img src="4kwallpaperlogo.png" alt="Site Logo" class="logo">
-                <span class="logo-text">4kwallpaper</span>
-            </a>
-            <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
-                    <div class="toggle-slider"></div>
-                    <svg class="icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle></svg>
-                    <svg class="icon moon-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                </button>
-            </div>
-        </div>
-    </header>
+<header class="navbar">
+    <div class="navbar-content">
+        <a href="/" class="logo">📖 4kwallpaper</a>
+        <button class="theme-btn" id="themeBtn">🌙</button>
+    </div>
+</header>
 
-    <main class="editor-container">
-        <form id="editorForm">
-            <input type="text" id="postTitle" class="editor-title" placeholder="Title" required autocomplete="off">
-            <input type="text" id="postSubtitle" class="editor-subtitle" placeholder="Short description..." required autocomplete="off">
-            <textarea id="postContent" class="editor-body" placeholder="Tell your story..." required></textarea>
-            
-            <div class="editor-actions">
-                <button type="submit" class="publish-btn">Generate & Copy Post Data</button>
-            </div>
-        </form>
-    </main>
+<main class="main">
+    <div id="content">
+        <div class="loading">Loading post...</div>
+    </div>
+</main>
 
-    <footer class="site-footer">
-        <div class="footer-content">
-            <p>&copy; 2026 4kwallpaper.</p>
-            <div class="footer-links">
-                <a href="#">About</a>
-                <a href="#">Terms & Conditions</a>
-                <a href="#">Disclaimer</a>
-            </div>
-        </div>
-    </footer>
+<script>
+const API_URL = 'https://api.github.com/repos/ganesh412004/4kwallpaper/contents/posts';
+const content = document.getElementById('content');
+const themeBtn = document.getElementById('themeBtn');
+const html = document.documentElement;
 
-    <script src="post.js"></script>
+const params = new URLSearchParams(window.location.search);
+const filename = params.get('file');
+
+themeBtn.addEventListener('click', () => {
+    html.classList.toggle('dark-mode');
+    localStorage.setItem('theme', html.classList.contains('dark-mode') ? 'dark' : 'light');
+    themeBtn.textContent = html.classList.contains('dark-mode') ? '☀️' : '🌙';
+});
+
+if (localStorage.getItem('theme') === 'dark') {
+    html.classList.add('dark-mode');
+    themeBtn.textContent = '☀️';
+}
+
+async function loadPost() {
+    if (!filename) {
+        content.innerHTML = '<div class="error">❌ No post specified</div>';
+        return;
+    }
+    
+    try {
+        const url = `${API_URL}/${encodeURIComponent(filename)}`;
+        console.log('Fetching post from:', url);
+        
+        const res = await fetch(url);
+        const fileData = await res.json();
+        
+        const postRes = await fetch(fileData.download_url);
+        const post = await postRes.json();
+        
+        document.title = (post.title || 'Post') + ' - 4kwallpaper';
+        
+        const dateStr = post.date ? new Date(post.date).toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        }) : 'Today';
+        
+        const readTime = Math.ceil((post.content || '').split(' ').length / 200);
+        
+        content.innerHTML = `
+            <a href="/" class="back-link">← Back</a>
+            <h1>${escapeHtml(post.title)}</h1>
+            <p class="subtitle">${escapeHtml(post.subtitle)}</p>
+            <div class="meta">${dateStr} • ${readTime} min read</div>
+            <div class="content">${formatContent(post.content)}</div>
+        `;
+    } catch (e) {
+        console.error('Error:', e);
+        content.innerHTML = '<div class="error">❌ Failed to load post. Check console.</div>';
+    }
+}
+
+function formatContent(text) {
+    return (text || '')
+        .split('\n')
+        .map(line => `<p>${escapeHtml(line)}</p>`)
+        .join('');
+}
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+loadPost();
+</script>
+
 </body>
 </html>
