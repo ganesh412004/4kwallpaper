@@ -14,13 +14,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (prefersDark) htmlEl.classList.add('dark-mode');
     }
 
-    // --- THEME SWAP MANAGER (improved) ---
+    // --- ENHANCED THEME SWAP MANAGER ---
     themeToggle.addEventListener("click", () => {
         htmlEl.classList.toggle("dark-mode");
         localStorage.setItem("theme", htmlEl.classList.contains("dark-mode") ? "dark" : "light");
     });
 
-    // Generate a deterministic numeric view count and a formatted label
+    // Generate a deterministic numeric view count and formatted label
     function generateViewsMetric(str) {
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const res = await fetch(API_URL);
             if (!res.ok) {
-                postsFeed.innerHTML = '<p class="loading-status">Welcome Admin! Create a folder named "posts" in your repo and add your first json post file to begin.</p>';
+                postsFeed.innerHTML = '<p class="loading-status">Welcome! Posts folder is empty. Add your first JSON post file to begin.</p>';
                 return;
             }
 
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const jsonFiles = files.filter(file => file.name && file.name.toLowerCase().endsWith('.json'));
 
             if (jsonFiles.length === 0) {
-                postsFeed.innerHTML = '<p class="loading-status">Your "posts" folder is empty. Drop a .json file in it to display content.</p>';
+                postsFeed.innerHTML = '<p class="loading-status">Your "posts" folder is empty. Add a .json file to display content.</p>';
                 return;
             }
 
@@ -79,17 +79,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 // freshness weight (newer posts get slight bump) if date exists
                 const ageDays = a.date ? ((Date.now() - new Date(a.date)) / (1000*60*60*24)) : 3650;
                 a.__ageDays = Math.max(1, ageDays);
-                a.__score = (a.__viewsNum / a.__ageDays) * (0.6 + Math.random() * 0.8); // weighted random scoring
+                // Medium-style algorithm: views weighted by freshness + randomness factor
+                a.__score = (a.__viewsNum / Math.sqrt(a.__ageDays)) * (0.5 + Math.random() * 0.9);
                 return a;
             });
 
-            // Sort by score desc but keep randomness integrated
+            // Sort by score desc with integrated randomness
             articles.sort((x, y) => y.__score - x.__score);
 
             // Render
             postsFeed.innerHTML = "";
 
-            articles.forEach(post => {
+            articles.forEach((post, index) => {
                 const dateFormatted = new Date(post.date || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 const wordCount = (((post.content || '') + ' ' + (post.subtitle || '')).trim().split(/\s+/).filter(Boolean)).length;
                 const readingTime = Math.max(1, Math.ceil(wordCount / 200)) + ' min read';
@@ -97,13 +98,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const card = document.createElement('article');
                 card.className = 'medium-card';
+                card.style.animationDelay = (index * 0.1) + 's';
 
                 // Link to post viewer with filename param
                 const filenameParam = encodeURIComponent(post.__filename || '');
                 card.innerHTML = `
-                    <a class="card-link" href="post.html?file=${filenameParam}" aria-label="Open story ${escapeHtml(post.title || 'story')}">
+                    <a class="card-link" href="viewer.html?file=${filenameParam}" aria-label="Open story ${escapeHtml(post.title || 'story')}">
                         <div class="meta-row">
-                            <span class="algorithm-badge">Trending</span>
+                            <span class="algorithm-badge">Popular</span>
                             <span>&middot;</span>
                             <span>${dateFormatted}</span>
                             <span>&middot;</span>
@@ -120,8 +122,8 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
         } catch (err) {
-            postsFeed.innerHTML = '<p class="loading-status">Critical network connection problem. Try refreshing your browser.</p>';
-            console.error('Master fetch fatal crash: ', err);
+            postsFeed.innerHTML = '<p class="loading-status">Network connection issue. Please refresh your browser.</p>';
+            console.error('Fetch error: ', err);
         }
     }
 
@@ -135,28 +137,50 @@ document.addEventListener("DOMContentLoaded", () => {
             .replace(/'/g, '&#039;');
     }
 
-    // --- SEARCH ---
+    // --- SEARCH FUNCTIONALITY ---
     if (searchInput) {
+        let searchTimeout;
         searchInput.addEventListener('input', (e) => {
-            const q = e.target.value.toLowerCase().trim();
-            const cards = document.querySelectorAll('.medium-card');
-            cards.forEach(card => {
-                const text = (card.textContent || '').toLowerCase();
-                card.style.display = text.includes(q) ? 'flex' : 'none';
-            });
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const q = e.target.value.toLowerCase().trim();
+                const cards = document.querySelectorAll('.medium-card');
+                let visibleCount = 0;
+                cards.forEach(card => {
+                    const text = (card.textContent || '').toLowerCase();
+                    const isVisible = !q || text.includes(q);
+                    card.style.display = isVisible ? 'flex' : 'none';
+                    if (isVisible) visibleCount++;
+                });
+                if (visibleCount === 0 && q) {
+                    const noResults = document.createElement('p');
+                    noResults.className = 'loading-status';
+                    noResults.textContent = 'No stories found matching your search.';
+                    postsFeed.appendChild(noResults);
+                }
+            }, 300);
         });
     }
 
-    // Footer modal logic (unchanged but kept safe)
+    // Footer modal logic
     const modal = document.getElementById('footerModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
     const closeModal = document.getElementById('closeModal');
 
     const modalData = {
-        about: { title: 'About 4kwallpaper', text: 'Welcome to 4kwallpaper. We are a curated repository dedicated to providing high-resolution imagery and ultra-HD aesthetic content landscapes.' },
-        terms: { title: 'Terms & Conditions', text: 'By browsing this application, you agree to access content for personal visualization use cases only.' },
-        disclaimer: { title: 'Disclaimer', text: 'All assets hosted within our network paths are shared strictly for community reference.' }
+        about: { 
+            title: 'About 4kwallpaper', 
+            text: 'Welcome to 4kwallpaper. A curated feed dedicated to providing inspiring, high-resolution content and stories. Posts are stored directly in our GitHub repository and displayed using a Medium-style algorithm that balances popularity with freshness.'
+        },
+        terms: { 
+            title: 'Terms & Conditions', 
+            text: 'By browsing this application, you agree to access content for personal use only. All content is sourced from our community and GitHub repository.'
+        },
+        disclaimer: { 
+            title: 'Disclaimer', 
+            text: 'All posts and content are community-driven. We do not claim ownership of all materials. Content is shared for educational and inspirational purposes only.' 
+        }
     };
 
     function openModal(type) {
