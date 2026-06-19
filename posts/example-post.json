@@ -1,6 +1,6 @@
 {
-  "title": "Welcome to 4kwallpaper",
-  "subtitle": "Your first post on the platform",
-  "content": "Welcome to 4kwallpaper! This is your first post. You can create new posts by adding JSON files to the posts folder in your GitHub repository.\n\nEach post is stored directly in GitHub, making it easy to version control your content and deploy updates instantly.\n\nTo create a new post:\n\n1. Go to the posts folder\n2. Create a new .json file\n3. Add your title, subtitle, and content\n4. Commit and push to GitHub\n\nYour post will appear immediately on the website! The feed uses a Medium-style algorithm to show the most engaging posts based on views, freshness, and discovery randomness.\n\nThanks for using 4kwallpaper!",
+  "title": "A Single README.md File Went Viral. The Reason Is Embarrassingly Simple.",
+  "subtitle": "91,000 stars on GitHub. No code. Four simple rules that every coding agent should follow.",
+  "content": "This incredible story shows the power of simplicity in software development.\n\nA GitHub repository with just a README.md file gained 91,000 stars. No complex code, no fancy frameworks, just pure clarity and helpful guidance.\n\nWhat makes this approach so powerful?\n\n1. Clarity: Every instruction is crystal clear\n2. Simplicity: No unnecessary complexity\n3. Usefulness: Directly solves real problems\n4. Shareability: Easy to understand and teach others\n\nIn our world of 10,000 line codebases and complex architectures, sometimes the most viral ideas are the simplest ones.\n\nThis reminds us that good documentation and clear thinking can be just as valuable as code itself.",
   "date": "2026-06-18"
 }

@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4kwallpaper - Feed</title>
+    <title>4kwallpaper - Stories Feed</title>
     <link rel="stylesheet" href="style.css">
     <script>
-        // Instant theme configuration lock
         if (localStorage.getItem("theme") === "dark") {
             document.documentElement.classList.add("dark-mode");
         }
@@ -14,25 +13,24 @@
 </head>
 <body>
 
-    <header class="apple-header">
-        <div class="header-content">
+    <header class="navbar">
+        <div class="navbar-content">
             <a href="index.html" class="logo-container">
-                <img src="4kwallpaperlogo.png" alt="4kwallpaper Logo" class="logo">
+                <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                    <polyline points="13 2 13 9 20 9"></polyline>
+                </svg>
                 <span class="logo-text">4kwallpaper</span>
             </a>
 
-            <div class="search-bar-container">
-                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <input type="text" id="headerSearch" placeholder="Search stories..." autocomplete="off">
+            <div class="nav-middle">
+                <a href="#" class="nav-item">For you</a>
+                <a href="#featured" class="nav-item active">Featured</a>
             </div>
 
-            <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Interface Theme">
-                    <div class="toggle-slider"></div>
-                    <svg class="icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="5"></circle>
                         <line x1="12" y1="1" x2="12" y2="3"></line>
                         <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -43,38 +41,66 @@
                         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
-                    <svg class="icon moon-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
                 </button>
             </div>
         </div>
+        <div class="navbar-divider"></div>
     </header>
 
-    <main class="medium-container">
-        <div id="postsFeed">
-            <p class="loading-status">Curating your personalized feed...</p>
+    <main class="main-container">
+        <div class="feed-wrapper">
+            <!-- LEFT SECTION: Posts Feed -->
+            <section class="feed-section">
+                <div id="postsFeed" class="posts-container">
+                    <div class="loading-state">
+                        <p>Loading stories...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT SECTION: Sidebar -->
+            <aside class="sidebar">
+                <!-- Search -->
+                <div class="sidebar-box search-box">
+                    <input type="text" id="sidebarSearch" placeholder="Search" class="search-input" autocomplete="off">
+                </div>
+
+                <!-- Staff Picks -->
+                <div class="sidebar-box">
+                    <h3 class="sidebar-title">Staff Picks</h3>
+                    <div id="staffPicks" class="staff-picks-list">
+                        <div class="loading-text">Loading...</div>
+                    </div>
+                </div>
+
+                <!-- Recommended Topics -->
+                <div class="sidebar-box">
+                    <h3 class="sidebar-title">Recommended topics</h3>
+                    <div class="topics-list">
+                        <button class="topic-btn">+ Programming</button>
+                        <button class="topic-btn">+ Technology</button>
+                        <button class="topic-btn">+ Design</button>
+                        <button class="topic-btn">+ Writing</button>
+                    </div>
+                </div>
+            </aside>
         </div>
     </main>
 
-    <footer class="site-footer">
+    <footer class="footer">
         <div class="footer-content">
-            <p>&copy; 2026 4kwallpaper.</p>
+            <p>&copy; 2026 4kwallpaper</p>
             <div class="footer-links">
-                <a href="#" id="openAbout">About</a>
-                <a href="#" id="openTerms">Terms & Conditions</a>
-                <a href="#" id="openDisclaimer">Disclaimer</a>
+                <a href="#">About</a>
+                <a href="#">Help</a>
+                <a href="#">Terms</a>
+                <a href="#">Privacy</a>
             </div>
         </div>
     </footer>
-
-    <div id="footerModal" class="modal-overlay">
-        <div class="modal-box">
-            <button class="modal-close" id="closeModal">&times;</button>
-            <h2 id="modalTitle">Title</h2>
-            <div id="modalBody" class="modal-text">Content goes here...</div>
-        </div>
-    </div>
 
     <script src="script.js"></script>
 </body>
