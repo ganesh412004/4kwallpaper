@@ -1,0 +1,6 @@
+{
+  "title": "Welcome to 4kwallpaper Stories",
+  "subtitle": "Your first post - The power of simplicity in sharing ideas",
+  "content": "Welcome to 4kwallpaper! This is your first story post.\n\nHow to add more posts:\n\n1. Go to the 'posts' folder in your GitHub repository\n2. Click 'Add file' → 'Create new file'\n3. Name it something like 'my-post.json'\n4. Use this format:\n\n{\n  \"title\": \"Your Post Title\",\n  \"subtitle\": \"Short description\",\n  \"content\": \"Your full story...\",\n  \"date\": \"2026-06-19\"\n}\n\n5. Click 'Commit changes'\n\nYour post will appear instantly on the home page! The feed automatically ranks posts by views, freshness, and engagement - just like Medium.\n\nEnjoy sharing your stories!",
+  "date": "2026-06-19"
+}

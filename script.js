@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const sidebarSearch = document.getElementById("sidebarSearch");
     const htmlEl = document.documentElement;
 
+    console.log("Page loaded. Starting to fetch posts...");
+
     // Theme handling
     if (!localStorage.getItem("theme")) {
         const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -49,31 +51,65 @@ document.addEventListener("DOMContentLoaded", () => {
         return { num: base, label };
     }
 
+    // Get random Medium-style placeholder image
+    function getPlaceholderImageUrl(index) {
+        const placeholders = [
+            'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=300&fit=crop',
+            'https://images.unsplash.com/photo-1633356122544-f134324ef6db?w=600&h=300&fit=crop',
+            'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=600&h=300&fit=crop',
+            'https://images.unsplash.com/photo-1516321318423-f06b1b504d4a?w=600&h=300&fit=crop',
+            'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=300&fit=crop',
+            'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&h=300&fit=crop',
+            'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=300&fit=crop',
+            'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=300&fit=crop'
+        ];
+        return placeholders[index % placeholders.length];
+    }
+
     // Load all posts
     async function loadStoriesFromGitHub() {
         try {
+            console.log("Fetching from:", API_URL);
             const res = await fetch(API_URL);
+            console.log("Response status:", res.status, res.ok);
+            
             if (!res.ok) {
-                postsFeed.innerHTML = '<div class="loading-state"><p>No posts yet. Add JSON files to the posts folder to get started!</p></div>';
-                staffPicks.innerHTML = '<div class="loading-text">No posts available</div>';
+                console.log("API not OK, showing empty state");
+                postsFeed.innerHTML = '<div class="loading-state"><p>📝 No posts yet. Add JSON files to the <code>posts</code> folder in your repo to get started!</p></div>';
+                staffPicks.innerHTML = '<div class="loading-text">No posts yet</div>';
                 return;
             }
 
             const files = await res.json();
+            console.log("Files found:", files.length);
+            
+            if (!Array.isArray(files)) {
+                console.error("Response is not an array:", files);
+                postsFeed.innerHTML = '<div class="loading-state"><p>⚠️ Error: posts folder structure invalid</p></div>';
+                return;
+            }
+            
             const jsonFiles = files.filter(file => file.name && file.name.toLowerCase().endsWith('.json'));
+            console.log("JSON files found:", jsonFiles.length, jsonFiles.map(f => f.name));
 
             if (jsonFiles.length === 0) {
-                postsFeed.innerHTML = '<div class="loading-state"><p>Your posts folder is empty. Add a .json file to get started!</p></div>';
+                console.log("No JSON files found");
+                postsFeed.innerHTML = '<div class="loading-state"><p>📂 Your posts folder is empty. Add a .json file to get started!</p></div>';
                 staffPicks.innerHTML = '<div class="loading-text">No posts available</div>';
                 return;
             }
 
             const fetchPromises = jsonFiles.map(async (file) => {
                 try {
+                    console.log("Fetching post file:", file.name);
                     const r = await fetch(file.download_url);
-                    if (!r.ok) return null;
+                    if (!r.ok) {
+                        console.error(`Failed to fetch ${file.name}:`, r.status);
+                        return null;
+                    }
                     const parsed = await r.json();
                     parsed.__filename = file.name;
+                    console.log("Parsed post:", parsed.title);
                     return parsed;
                 } catch (jsonErr) {
                     console.error(`Error loading ${file.name}:`, jsonErr);
@@ -82,23 +118,28 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             let articles = (await Promise.all(fetchPromises)).filter(p => p !== null);
+            console.log("Valid articles loaded:", articles.length);
+            
             if (articles.length === 0) {
-                postsFeed.innerHTML = '<div class="loading-state"><p>Error parsing posts. Check JSON formatting.</p></div>';
+                console.error("All articles failed to parse");
+                postsFeed.innerHTML = '<div class="loading-state"><p>⚠️ Error parsing posts. Check JSON formatting in your posts.</p></div>';
                 return;
             }
 
             // Calculate scores for ranking
-            articles = articles.map(a => {
+            articles = articles.map((a, i) => {
                 const views = generateViewsMetric(a.title || 'Untitled');
                 a.__viewsNum = views.num;
                 a.__viewsLabel = views.label;
-                const ageDays = a.date ? ((Date.now() - new Date(a.date)) / (1000*60*60*24)) : 3650;
+                const ageDays = a.date ? ((Date.now() - new Date(a.date)) / (1000*60*60*24)) : 0.1;
                 a.__ageDays = Math.max(1, ageDays);
                 a.__score = (a.__viewsNum / Math.sqrt(a.__ageDays)) * (0.5 + Math.random() * 0.9);
+                a.__index = i;
                 return a;
             });
 
             articles.sort((x, y) => y.__score - x.__score);
+            console.log("Articles sorted by score");
 
             // Render feed
             postsFeed.innerHTML = "";
@@ -108,13 +149,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 const wordCount = (((post.content || '') + ' ' + (post.subtitle || '')).trim().split(/\s+/).filter(Boolean)).length;
                 const readingTime = Math.max(1, Math.ceil(wordCount / 200));
                 const viewsLabel = post.__viewsLabel || generateViewsMetric(post.title || 'Untitled').label;
+                const imageUrl = getPlaceholderImageUrl(index);
 
                 const card = document.createElement('article');
                 card.className = 'post-card';
                 card.style.animationDelay = (index * 0.05) + 's';
 
                 const filenameParam = encodeURIComponent(post.__filename || '');
-                const gradient = getGradient(index);
 
                 card.innerHTML = `
                     <a href="viewer.html?file=${filenameParam}" style="text-decoration: none; color: inherit;" class="post-link">
@@ -133,32 +174,39 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <span>${viewsLabel} views</span>
                             </div>
                         </div>
-                        <div class="post-image" style="--bg-image: url('${getColorForIndex(index)}'); background: ${gradient};"></div>
+                        <div class="post-image" style="background-image: url('${imageUrl}'); background-size: cover; background-position: center;"></div>
                     </a>
                 `;
 
                 postsFeed.appendChild(card);
             });
 
+            console.log("Feed rendered with", articles.length, "posts");
             // Render staff picks (top 3 posts)
             renderStaffPicks(articles.slice(0, 3));
 
         } catch (err) {
-            postsFeed.innerHTML = '<div class="loading-state"><p>Network error. Please refresh.</p></div>';
-            console.error('Fetch error:', err);
+            console.error('Critical fetch error:', err);
+            postsFeed.innerHTML = '<div class="loading-state"><p>🔴 Network error. Please check console and refresh.</p></div>';
         }
     }
 
     function renderStaffPicks(topPosts) {
         staffPicks.innerHTML = "";
+        if (topPosts.length === 0) {
+            staffPicks.innerHTML = '<div class="loading-text">No posts available</div>';
+            return;
+        }
+        
         topPosts.forEach((post, index) => {
             const item = document.createElement('div');
             item.className = 'staff-pick-item';
             const filenameParam = encodeURIComponent(post.__filename || '');
+            const imageUrl = getPlaceholderImageUrl(index);
 
             item.innerHTML = `
                 <a href="viewer.html?file=${filenameParam}" style="text-decoration: none; color: inherit; display: flex; gap: 12px; width: 100%;">
-                    <div class="staff-pick-avatar" style="background: linear-gradient(135deg, ${GRADIENT_COLORS[index].from} 0%, ${GRADIENT_COLORS[index].to} 100%);"></div>
+                    <div class="staff-pick-avatar" style="background-image: url('${imageUrl}'); background-size: cover; background-position: center;"></div>
                     <div class="staff-pick-text">
                         <div class="staff-pick-author">Staff Pick</div>
                         <div class="staff-pick-title">${escapeHtml(post.title || 'Untitled')}</div>
@@ -178,20 +226,17 @@ document.addEventListener("DOMContentLoaded", () => {
             .replace(/'/g, '&#039;');
     }
 
-    function getColorForIndex(index) {
-        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#a29bfe', '#fd79a8', '#fdcb6e'];
-        return colors[index % colors.length];
-    }
-
     // Search functionality
-    sidebarSearch.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        const cards = document.querySelectorAll('.post-card');
-        cards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            card.style.display = text.includes(query) ? '' : 'none';
+    if (sidebarSearch) {
+        sidebarSearch.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.post-card');
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query) ? '' : 'none';
+            });
         });
-    });
+    }
 
     loadStoriesFromGitHub();
 });

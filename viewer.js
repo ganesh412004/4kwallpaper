@@ -7,13 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const storyContent = document.getElementById("storyContent");
     const htmlEl = document.documentElement;
 
-    // Respect saved preference or system if not set
+    // Theme handling
     if (!localStorage.getItem("theme")) {
         const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (prefersDark) htmlEl.classList.add('dark-mode');
     }
 
-    // Theme toggle
     themeToggle.addEventListener("click", () => {
         htmlEl.classList.toggle("dark-mode");
         localStorage.setItem("theme", htmlEl.classList.contains("dark-mode") ? "dark" : "light");
@@ -23,8 +22,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams(window.location.search);
     const filename = params.get('file');
 
+    console.log("Loading post with filename:", filename);
+
     if (!filename) {
-        storyContent.innerHTML = '<p class="loading-status">No story selected.</p>';
+        storyContent.innerHTML = '<div class="loading-status">No post selected.</div>';
         return;
     }
 
@@ -32,16 +33,24 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadStory() {
         try {
             const fileUrl = `${API_URL}/${encodeURIComponent(filename)}`;
+            console.log("Fetching from:", fileUrl);
+            
             const res = await fetch(fileUrl);
+            console.log("Response status:", res.status);
             
             if (!res.ok) {
-                storyContent.innerHTML = '<p class="loading-status">Story not found.</p>';
+                storyContent.innerHTML = '<div class="loading-status">Post not found (404).</div>';
                 return;
             }
 
             const fileData = await res.json();
+            console.log("File metadata:", fileData);
+            
             const contentRes = await fetch(fileData.download_url);
+            console.log("Content response status:", contentRes.status);
+            
             const post = await contentRes.json();
+            console.log("Post loaded:", post.title);
 
             // Update page title
             document.title = (post.title || 'Story') + ' - 4kwallpaper';
@@ -67,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     .replace(/'/g, '&#039;');
             }
 
-            // Convert markdown-like content to HTML (basic conversion)
+            // Convert markdown-like content to HTML
             function formatContent(text) {
                 let html = escapeHtml(text);
                 
@@ -90,51 +99,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 <p class="subtitle">${escapeHtml(post.subtitle || '')}</p>
                 <div class="meta">
                     <span>${dateFormatted}</span>
-                    <span>&middot;</span>
+                    <span>·</span>
                     <span>${readingTime}</span>
                 </div>
                 <div class="content">${formatContent(post.content || '')}</div>
             `;
 
         } catch (err) {
-            storyContent.innerHTML = '<p class="loading-status">Error loading story. Please try again.</p>';
             console.error('Error loading story:', err);
+            storyContent.innerHTML = '<div class="loading-status">Error loading story. Please try again.</div>';
         }
     }
-
-    // Footer modal logic
-    const modal = document.getElementById('footerModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-    const closeModal = document.getElementById('closeModal');
-
-    const modalData = {
-        about: { 
-            title: 'About 4kwallpaper', 
-            text: 'Welcome to 4kwallpaper. A curated feed dedicated to providing inspiring, high-resolution content and stories. Posts are stored directly in our GitHub repository and displayed using a Medium-style algorithm.'
-        },
-        terms: { 
-            title: 'Terms & Conditions', 
-            text: 'By browsing this application, you agree to access content for personal use only.'
-        },
-        disclaimer: { 
-            title: 'Disclaimer', 
-            text: 'All posts and content are community-driven. Content is shared for educational and inspirational purposes only.' 
-        }
-    };
-
-    function openModal(type) {
-        modalTitle.textContent = modalData[type].title;
-        modalBody.textContent = modalData[type].text;
-        modal.classList.add('active');
-    }
-
-    document.getElementById('openAbout').addEventListener('click', (e) => { e.preventDefault(); openModal('about'); });
-    document.getElementById('openTerms').addEventListener('click', (e) => { e.preventDefault(); openModal('terms'); });
-    document.getElementById('openDisclaimer').addEventListener('click', (e) => { e.preventDefault(); openModal('disclaimer'); });
-
-    closeModal.addEventListener('click', () => modal.classList.remove('active'));
-    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
 
     loadStory();
 });
